@@ -10,8 +10,10 @@ use world::*;
 
 mod utilities;
 
+const DEFAULT_NAME: &str = "unnamed_world";
+
 pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Error>> {
-    let path = Path::new("./").join(name.unwrap_or(&String::from("unnamed_world")));
+    let path = Path::new("./").join(name.unwrap_or(&String::from(DEFAULT_NAME)));
     if !Path::exists(&path) {
         fs::create_dir(&path)?;
     }
@@ -24,6 +26,16 @@ pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Err
     let file = File::create(settings_path)?;
     serde_yaml::to_writer(file, &MapSettings::default())?;
 
+    Ok(())
+}
+
+pub fn generate(name: Option<&String>) -> Result<(), Box<dyn Error>> {
+    let path = Path::new("./").join(name.unwrap_or(&String::from(DEFAULT_NAME)));
+
+    let settings_path = Path::new(&path).join("world_settings.yml");
+    let file = File::open(settings_path)?;
+    let x: WorldSettings = serde_yaml::from_reader(file)?;
+    println!("{}", x.get_seed());
 
     Ok(())
 }

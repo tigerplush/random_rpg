@@ -1,9 +1,15 @@
 use rand::{thread_rng, RngCore};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct WorldSettings {
     seed: u32,
+}
+
+impl WorldSettings {
+    pub const fn get_seed(&self) -> u32 {
+        self.seed
+    }
 }
 
 impl Default for WorldSettings {

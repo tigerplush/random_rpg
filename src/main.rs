@@ -1,5 +1,7 @@
+use core::panic;
+
 use clap::{value_parser, Arg, Command};
-use random_rpg::init;
+use random_rpg::{generate, init};
 
 fn main() {
     let matches = Command::new("rrpg")
@@ -14,6 +16,11 @@ fn main() {
                         .value_parser(value_parser!(u32)),
                 ),
         )
+        .subcommand(
+            Command::new("generate")
+                .about("Takes settings files and generates a world from them")
+                .arg(Arg::new("name").short('n').long("name")),
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -24,6 +31,13 @@ fn main() {
                 Ok(_) => (),
                 Err(error) => panic!("Problem creating new world: {error:?}"),
             };
+        },
+        Some(("generate", generate_matches)) => {
+            let name = generate_matches.get_one::<String>("name");
+            match generate(name) {
+                Ok(_) => (),
+                Err(error) => panic!("Problem generating world: {error:?}"),
+            }
         }
         _ => unreachable!(),
     }
