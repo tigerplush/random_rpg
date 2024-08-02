@@ -11,11 +11,12 @@ use world::*;
 mod utilities;
 
 const DEFAULT_NAME: &str = "unnamed_world";
+const DEFAULT_SETTINGS_PATH: &str = "settings";
 
 pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Error>> {
-    let path = Path::new("./").join(name.unwrap_or(&String::from(DEFAULT_NAME)));
+    let path = Path::new("./").join(name.unwrap_or(&String::from(DEFAULT_NAME))).join(DEFAULT_SETTINGS_PATH);
     if !Path::exists(&path) {
-        fs::create_dir(&path)?;
+        fs::create_dir_all(&path)?;
     }
 
     let settings_path = Path::new(&path).join("world_settings.yml");
@@ -30,7 +31,7 @@ pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Err
 }
 
 pub fn generate(name: Option<&String>) -> Result<(), Box<dyn Error>> {
-    let path = Path::new("./").join(name.unwrap_or(&String::from(DEFAULT_NAME)));
+    let path = Path::new("./").join(name.unwrap_or(&String::from(DEFAULT_NAME))).join(DEFAULT_SETTINGS_PATH);
 
     let settings_path = Path::new(&path).join("world_settings.yml");
     let file = File::open(settings_path)?;
