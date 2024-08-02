@@ -1,13 +1,13 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct UVec2 {
-    x: u32,
-    y: u32,
+    pub x: usize,
+    pub y: usize,
 }
 
 impl UVec2 {
-    pub const fn new(x: u32, y: u32) -> Self {
+    pub const fn new(x: usize, y: usize) -> Self {
         UVec2 { x, y }
     }
 }
