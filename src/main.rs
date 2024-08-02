@@ -31,7 +31,7 @@ fn main() {
                 Ok(_) => (),
                 Err(error) => panic!("Problem creating new world: {error:?}"),
             };
-        },
+        }
         Some(("generate", generate_matches)) => {
             let name = generate_matches.get_one::<String>("name");
             match generate(name) {
