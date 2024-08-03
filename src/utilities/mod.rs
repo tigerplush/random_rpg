@@ -11,3 +11,15 @@ impl UVec2 {
         UVec2 { x, y }
     }
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct Vec2 {
+    pub x: f64,
+    pub y: f64,
+}
+
+impl Vec2 {
+    pub const fn new(x: f64, y: f64) -> Self {
+        Vec2 { x, y }
+    }
+}
