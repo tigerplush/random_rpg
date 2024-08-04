@@ -22,7 +22,6 @@ pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf) {
             Some(seed) => seed,
             None => rng.next_u32(),
         };
-        println!("layer {} seed is {}", i, layer_seed);
         let basic_multi = BasicMulti::<Simplex>::new(layer_seed)
             .set_octaves(layer.octaves)
             .set_lacunarity(layer.lacunarity)
