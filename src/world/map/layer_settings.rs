@@ -18,6 +18,23 @@ pub struct LayerSettings {
     pub frequency: f64,
 }
 
+impl LayerSettings {
+    pub const fn set_frequency(mut self, frequency: f64) -> Self {
+        self.frequency = frequency;
+        self
+    }
+
+    pub const fn set_lacunarity(mut self, lacunarity: f64) -> Self {
+        self.lacunarity = lacunarity;
+        self
+    }
+
+    pub const fn set_octaves(mut self, octaves: usize) -> Self {
+        self.octaves = octaves;
+        self
+    }
+}
+
 impl Default for LayerSettings {
     fn default() -> Self {
         LayerSettings {

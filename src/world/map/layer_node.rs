@@ -1,14 +1,11 @@
-use noise::{Clamp, Curve, Fbm, Min, MultiFractal, NoiseFn, Perlin, ScaleBias};
+use noise::{
+    Clamp, Curve, Fbm, Min, MultiFractal, NoiseFn, Perlin, ScaleBias,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::map::min_settings;
-
 use super::{
-    clamp_settings::ClampSettings,
-    layer_settings::LayerSettings,
-    min_settings::MinSettings,
-    scale_settings::{self, ScaleSettings},
-    terrain_shape::TerrainShape,
+    clamp_settings::ClampSettings, layer_settings::LayerSettings, min_settings::MinSettings,
+    scale_settings::ScaleSettings, terrain_shape::TerrainShape,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -34,73 +31,9 @@ impl LayerNode {
         }
     }
 
-    pub fn resolve(&self, pool: &Vec<LayerNode>) -> Box<dyn NoiseFn<f64, 3>> {
-        match &self.layer_type {
-            LayerType::Clamp(clamp_settings) => {
-                let Some(next_node) = pool.iter().find(|node| node.id == clamp_settings.input)
-                else {
-                    panic!(
-                        "Node {} could not find input node {}",
-                        self.id, clamp_settings.input
-                    );
-                };
-                let source = next_node.resolve(pool);
-                Self::clamp(source, clamp_settings)
-            }
-            LayerType::ScaleBias(scale_settings) => {
-                let Some(next_node) = pool
-                    .iter()
-                    .find(|node: &&LayerNode| node.id == scale_settings.input)
-                else {
-                    panic!(
-                        "Node {} could not find input node {}",
-                        self.id, scale_settings.input
-                    );
-                };
-                let source = next_node.resolve(pool);
-                Self::scale(source, scale_settings)
-            }
-            LayerType::SimpleLayer(layer_settings) => Self::resolve_simple_layer(layer_settings),
-            LayerType::Min(min_settings) => {
-                let Some(lhs) = pool
-                    .iter()
-                    .find(|node: &&LayerNode| node.id == min_settings.lhs)
-                else {
-                    panic!(
-                        "Node {} could not find input node {}",
-                        self.id, min_settings.lhs
-                    );
-                };
-                let Some(rhs) = pool
-                    .iter()
-                    .find(|node: &&LayerNode| node.id == min_settings.rhs)
-                else {
-                    panic!(
-                        "Node {} could not find input node {}",
-                        self.id, min_settings.rhs
-                    );
-                };
-                Self::min(lhs.resolve(pool), rhs.resolve(pool))
-            }
-            LayerType::TerrainShape(shape_settings) => {
-                let Some(next_node) = pool
-                    .iter()
-                    .find(|node: &&LayerNode| node.id == shape_settings.input)
-                else {
-                    panic!(
-                        "Node {} could not find input node {}",
-                        self.id, shape_settings.input
-                    );
-                };
-                Self::curve(next_node.resolve(pool), shape_settings)
-            }
-            _ => unimplemented!(),
-        }
-    }
-
-    fn resolve_simple_layer(layer_settings: &LayerSettings) -> Box<dyn NoiseFn<f64, 3>> {
+    pub fn simple_layer(layer_settings: &LayerSettings, seed: u32) -> Box<dyn NoiseFn<f64, 3>> {
         Box::new(
-            Fbm::<Perlin>::new(0)
+            Fbm::<Perlin>::new(seed)
                 .set_frequency(layer_settings.frequency)
                 .set_persistence(layer_settings.persistence)
                 .set_lacunarity(layer_settings.lacunarity)
@@ -108,7 +41,7 @@ impl LayerNode {
         )
     }
 
-    fn clamp(
+    pub fn clamp(
         source: Box<dyn NoiseFn<f64, 3>>,
         clamp_settings: &ClampSettings,
     ) -> Box<dyn NoiseFn<f64, 3>> {
@@ -117,7 +50,7 @@ impl LayerNode {
         )
     }
 
-    fn scale(
+    pub fn scale(
         source: Box<dyn NoiseFn<f64, 3>>,
         scale_settings: &ScaleSettings,
     ) -> Box<dyn NoiseFn<f64, 3>> {
@@ -128,17 +61,20 @@ impl LayerNode {
         )
     }
 
-    fn min(
+    pub fn min(
         lhs: Box<dyn NoiseFn<f64, 3>>,
         rhs: Box<dyn NoiseFn<f64, 3>>,
     ) -> Box<dyn NoiseFn<f64, 3>> {
         Box::new(Min::new(lhs, rhs))
     }
 
-    fn curve(
+    pub fn curve(
         source: Box<dyn NoiseFn<f64, 3>>,
         shape_settings: &TerrainShape,
     ) -> Box<dyn NoiseFn<f64, 3>> {
+        if shape_settings.control_points.len() < 4 {
+            panic!("You need at least four points for terrain shaping");
+        }
         let mut curve = Curve::new(source);
         for point in &shape_settings.control_points {
             curve = curve.add_control_point(point.x, point.y);
@@ -153,7 +89,7 @@ impl LayerNode {
                 "cu",
                 LayerType::TerrainShape(TerrainShape::default().with_input("fb0")),
             ),
-            LayerNode::new("fb1", LayerType::SimpleLayer(LayerSettings::default())),
+            LayerNode::new("fb1", LayerType::SimpleLayer(LayerSettings::default().set_frequency(4.34375).set_octaves(11))),
             LayerNode::new(
                 "sb",
                 LayerType::ScaleBias(ScaleSettings::new("fb1", 0.375, 0.625)),

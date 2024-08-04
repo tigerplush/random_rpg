@@ -31,7 +31,7 @@ const DEFAULT_WORLD_SETTINGS_FILE: &str = "world_settings.yml";
 const DEFAULT_MAP_SETTINGS_FILE: &str = "map_settings.yml";
 
 pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Error>> {
-    let path = Path::new("./")
+    let path = Path::new(".")
         .join(name.unwrap_or(&String::from(DEFAULT_WORLD_NAME)))
         .join(DEFAULT_SETTINGS_PATH);
     if !Path::exists(&path) {
@@ -50,7 +50,7 @@ pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Err
 }
 
 pub fn generate(name: Option<&String>) -> Result<(), Box<dyn Error>> {
-    let path = Path::new("./")
+    let path = Path::new(".")
         .join(name.unwrap_or(&String::from(DEFAULT_WORLD_NAME)))
         .join(DEFAULT_SETTINGS_PATH);
 
@@ -62,7 +62,7 @@ pub fn generate(name: Option<&String>) -> Result<(), Box<dyn Error>> {
     let file = File::open(settings_path)?;
     let map_settings: MapSettings = serde_yaml::from_reader(file)?;
 
-    let output_path = Path::new("./")
+    let output_path = Path::new(".")
         .join(name.unwrap_or(&String::from(DEFAULT_WORLD_NAME)))
         .join(DEFAULT_OUTPUT_PATH);
     if !Path::exists(&output_path) {
