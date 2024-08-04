@@ -4,11 +4,11 @@ use std::{
     path::Path,
 };
 
-mod world;
+pub mod world;
 
 use world::*;
 
-mod utilities;
+pub mod utilities;
 
 const DEFAULT_WORLD_NAME: &str = "unnamed_world";
 const DEFAULT_SETTINGS_PATH: &str = "settings";
@@ -54,7 +54,7 @@ pub fn generate(name: Option<&String>) -> Result<(), Box<dyn Error>> {
     if !Path::exists(&output_path) {
         fs::create_dir_all(&output_path)?;
     }
-    map::generate(world_settings.get_seed(), &map_settings, output_path);
+    map::generate(world_settings.seed, &map_settings, output_path);
 
     Ok(())
 }
