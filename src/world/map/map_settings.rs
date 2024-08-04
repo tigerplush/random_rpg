@@ -6,22 +6,8 @@ use super::layer_settings::LayerSettings;
 
 #[derive(Serialize, Deserialize)]
 pub struct MapSettings {
-    size: UVec2,
-    layers: Vec<LayerSettings>,
-}
-
-impl MapSettings {
-    pub const fn get_world_width(&self) -> usize {
-        self.size.x
-    }
-
-    pub const fn get_world_height(&self) -> usize {
-        self.size.y
-    }
-
-    pub const fn get_layers(&self) -> &Vec<LayerSettings> {
-        &self.layers
-    }
+    pub size: UVec2,
+    pub layers: Vec<LayerSettings>,
 }
 
 impl Default for MapSettings {

@@ -12,11 +12,10 @@ use noise::{
 };
 
 pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf) {
-    let layers = settings.get_layers();
-    if layers.is_empty() {
+    if settings.layers.is_empty() {
         panic!("You need to specify at least one layer");
     }
-    for (i, layer) in layers.iter().enumerate() {
+    for (i, layer) in settings.layers.iter().enumerate() {
         let basic_multi = BasicMulti::<Simplex>::new(seed)
             .set_octaves(layer.octaves)
             .set_lacunarity(layer.lacunarity)
@@ -30,8 +29,8 @@ pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf) {
             curve = curve.add_control_point(point.x, point.y);
         }
         let noise_map = PlaneMapBuilder::new(curve)
-            .set_size(settings.get_world_width(), settings.get_world_height())
+            .set_size(settings.size.x, settings.size.y)
             .build();
-        noise_map.write_to_file(&path.join(format!("map_{}.png", i)));
+        noise_map.write_to_file(&path.join(format!("layer_{}.png", i)));
     }
 }
