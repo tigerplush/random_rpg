@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::utilities::UVec2;
 
-use super::{color_gradient::GradientPoint, layer_settings::LayerSettings};
+use super::{color_gradient::GradientPoint, layer_node::LayerNode};
 
 /// Describes the world map
 #[derive(Serialize, Deserialize)]
@@ -12,7 +12,7 @@ pub struct MapSettings {
     /// Large values will lead to longer generation times.
     /// Any dimension has to be less than 32767
     pub size: UVec2,
-    pub layers: Vec<LayerSettings>,
+    pub layers: Vec<LayerNode>,
     pub color_gradient: Vec<GradientPoint>,
 }
 
@@ -22,7 +22,7 @@ impl Default for MapSettings {
             // earth is roughly 40075km x 20014km, but the noise algorithm takes a long time
             // for large values, so we return 1024x512 (aspect ratio 2:1)
             size: UVec2::new(1024, 512),
-            layers: vec![LayerSettings::default()],
+            layers: LayerNode::continent_bundle(),
             // these are the default color gradient points from noise.rs
             color_gradient: vec![
                 GradientPoint::new(-1.0, 0, 0, 0),
