@@ -10,13 +10,20 @@ use noise::{
     utils::{NoiseMapBuilder, PlaneMapBuilder},
     BasicMulti, Curve, MultiFractal, Simplex,
 };
+use rand::{rngs::StdRng, RngCore, SeedableRng};
 
 pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf) {
     if settings.layers.is_empty() {
         panic!("You need to specify at least one layer");
     }
+    let mut rng = StdRng::seed_from_u64(seed as u64);
     for (i, layer) in settings.layers.iter().enumerate() {
-        let basic_multi = BasicMulti::<Simplex>::new(seed)
+        let layer_seed = match layer.seed {
+            Some(seed) => seed,
+            None => rng.next_u32(),
+        };
+        println!("layer {} seed is {}", i, layer_seed);
+        let basic_multi = BasicMulti::<Simplex>::new(layer_seed)
             .set_octaves(layer.octaves)
             .set_lacunarity(layer.lacunarity)
             .set_frequency(layer.frequency)
