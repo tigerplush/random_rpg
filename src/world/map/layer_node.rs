@@ -1,6 +1,4 @@
-use noise::{
-    Clamp, Curve, Fbm, Min, MultiFractal, NoiseFn, Perlin, ScaleBias,
-};
+use noise::{Clamp, Curve, Fbm, Min, MultiFractal, NoiseFn, Perlin, ScaleBias};
 use serde::{Deserialize, Serialize};
 
 use super::{
@@ -89,7 +87,14 @@ impl LayerNode {
                 "cu",
                 LayerType::TerrainShape(TerrainShape::default().with_input("fb0")),
             ),
-            LayerNode::new("fb1", LayerType::SimpleLayer(LayerSettings::default().set_frequency(4.34375).set_octaves(11))),
+            LayerNode::new(
+                "fb1",
+                LayerType::SimpleLayer(
+                    LayerSettings::default()
+                        .set_frequency(4.34375)
+                        .set_octaves(11),
+                ),
+            ),
             LayerNode::new(
                 "sb",
                 LayerType::ScaleBias(ScaleSettings::new("fb1", 0.375, 0.625)),

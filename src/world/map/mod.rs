@@ -14,8 +14,8 @@ use noise::utils::{
     ColorGradient, ImageRenderer, NoiseMapBuilder, PlaneMapBuilder, SphereMapBuilder,
 };
 
-pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf) {
-    let result = settings.generate(seed, &path);
+pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf, debug: bool) {
+    let result = settings.generate(seed, &path, debug);
 
     let mut color_gradient = ColorGradient::new();
     for gradient_point in &settings.color_gradient {

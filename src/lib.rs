@@ -49,7 +49,7 @@ pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Err
     Ok(())
 }
 
-pub fn generate(name: Option<&String>) -> Result<(), Box<dyn Error>> {
+pub fn generate(name: Option<&String>, debug: bool) -> Result<(), Box<dyn Error>> {
     let path = Path::new(".")
         .join(name.unwrap_or(&String::from(DEFAULT_WORLD_NAME)))
         .join(DEFAULT_SETTINGS_PATH);
@@ -68,7 +68,7 @@ pub fn generate(name: Option<&String>) -> Result<(), Box<dyn Error>> {
     if !Path::exists(&output_path) {
         fs::create_dir_all(&output_path)?;
     }
-    map::generate(world_settings.seed, &map_settings, output_path);
+    map::generate(world_settings.seed, &map_settings, output_path, debug);
 
     Ok(())
 }

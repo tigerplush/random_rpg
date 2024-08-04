@@ -27,14 +27,14 @@ pub struct MapSettings {
 }
 
 impl MapSettings {
-    pub fn generate(&self, seed: u32, path: &PathBuf) -> Box<dyn NoiseFn<f64, 3>> {
+    pub fn generate(&self, seed: u32, path: &PathBuf, debug: bool) -> Box<dyn NoiseFn<f64, 3>> {
         let Some(last_node) = self.layers.last() else {
             panic!("You need to specify at least one layer");
         };
 
         let mut rng = StdRng::seed_from_u64(seed as u64);
 
-        self.resolve(last_node, &mut rng, path)
+        self.resolve(last_node, &mut rng, path, debug)
     }
 
     fn resolve(
@@ -42,6 +42,7 @@ impl MapSettings {
         current_node: &LayerNode,
         rng: &mut StdRng,
         path: &PathBuf,
+        debug: bool,
     ) -> Box<dyn NoiseFn<f64, 3>> {
         let result = match &current_node.layer_type {
             LayerType::Clamp(clamp_settings) => {
@@ -55,11 +56,12 @@ impl MapSettings {
                         current_node.id, clamp_settings.input
                     );
                 };
-                let source = self.resolve(next_node, rng, path);
+                let source = self.resolve(next_node, rng, path, debug);
                 LayerNode::clamp(source, clamp_settings)
-            },
+            }
             LayerType::ScaleBias(scale_settings) => {
-                let Some(next_node) = self.layers
+                let Some(next_node) = self
+                    .layers
                     .iter()
                     .find(|node: &&LayerNode| node.id == scale_settings.input)
                 else {
@@ -68,9 +70,9 @@ impl MapSettings {
                         current_node.id, scale_settings.input
                     );
                 };
-                let source = self.resolve(next_node, rng, path);
+                let source = self.resolve(next_node, rng, path, debug);
                 LayerNode::scale(source, scale_settings)
-            },
+            }
             LayerType::SimpleLayer(layer_settings) => {
                 // make sure a random number always is consumed so if
                 // one layer has its own seed the next layer still gets the same
@@ -81,9 +83,10 @@ impl MapSettings {
                     None => random_seed,
                 };
                 LayerNode::simple_layer(layer_settings, seed)
-            },
+            }
             LayerType::Min(min_settings) => {
-                let Some(lhs) = self.layers
+                let Some(lhs) = self
+                    .layers
                     .iter()
                     .find(|node: &&LayerNode| node.id == min_settings.lhs)
                 else {
@@ -92,7 +95,8 @@ impl MapSettings {
                         current_node.id, min_settings.lhs
                     );
                 };
-                let Some(rhs) = self.layers
+                let Some(rhs) = self
+                    .layers
                     .iter()
                     .find(|node: &&LayerNode| node.id == min_settings.rhs)
                 else {
@@ -101,12 +105,13 @@ impl MapSettings {
                         current_node.id, min_settings.rhs
                     );
                 };
-                let lhs_result = self.resolve(lhs, rng, path);
-                let rhs_result = self.resolve(rhs, rng, path);
+                let lhs_result = self.resolve(lhs, rng, path, debug);
+                let rhs_result = self.resolve(rhs, rng, path, debug);
                 LayerNode::min(lhs_result, rhs_result)
-            },
+            }
             LayerType::TerrainShape(shape_settings) => {
-                let Some(next_node) = self.layers
+                let Some(next_node) = self
+                    .layers
                     .iter()
                     .find(|node: &&LayerNode| node.id == shape_settings.input)
                 else {
@@ -115,15 +120,17 @@ impl MapSettings {
                         current_node.id, shape_settings.input
                     );
                 };
-                let result = self.resolve(next_node, rng, path);
+                let result = self.resolve(next_node, rng, path, debug);
                 LayerNode::curve(result, shape_settings)
-            },
+            }
         };
 
-        PlaneMapBuilder::new(&result)
-            .set_size(self.size.x, self.size.y)
-            .build()
-            .write_to_file(&path.join(format!("layer_{}.png", current_node.id)));
+        if debug {
+            PlaneMapBuilder::new(&result)
+                .set_size(self.size.x, self.size.y)
+                .build()
+                .write_to_file(&path.join(format!("layer_{}.png", current_node.id)));
+        }
 
         result
     }

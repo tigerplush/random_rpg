@@ -1,6 +1,6 @@
 use core::panic;
 
-use clap::{value_parser, Arg, Command};
+use clap::{value_parser, Arg, ArgAction, Command};
 use random_rpg::{generate, init};
 
 fn main() {
@@ -19,7 +19,13 @@ fn main() {
         .subcommand(
             Command::new("generate")
                 .about("Takes settings files and generates a world from them")
-                .arg(Arg::new("name").short('n').long("name")),
+                .arg(Arg::new("name").short('n').long("name"))
+                .arg(
+                    Arg::new("debug")
+                        .short('d')
+                        .long("debug")
+                        .action(ArgAction::Count),
+                ),
         )
         .get_matches();
 
@@ -34,7 +40,8 @@ fn main() {
         }
         Some(("generate", generate_matches)) => {
             let name = generate_matches.get_one::<String>("name");
-            match generate(name) {
+            let debug = generate_matches.get_count("debug");
+            match generate(name, debug > 0) {
                 Ok(_) => (),
                 Err(error) => panic!("Problem generating world: {error:?}"),
             }
