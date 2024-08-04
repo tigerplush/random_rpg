@@ -1,3 +1,17 @@
+//! A procedural world generation library
+//!
+//! RandomRpg is meant to create immersive worlds and run simulations in them,
+//! showing the user output in form of a wikipedia they can browse through.
+//!
+//! Interaction with this world is done via event files in the event folder.
+//!
+//! ## Usage
+//! Call `rrpg init` to create a new world with default settings files. After
+//! adjusting the files to your liking, call `rrpg generate` to create a world file
+//! and it's wikipedia.
+//!
+//! Change the event file template to your liking and run `rrpg update` to incorporate
+//! the specified event into the world.
 use std::{
     error::Error,
     fs::{self, File},

@@ -1,0 +1,19 @@
+size:
+  x: 400
+  y: 200
+layers:
+- seed: null
+  octaves: 6
+  lacunarity: 2.0943951023931953
+  persistence: 0.5
+  frequency: 2.0
+  terrain_shaping:
+    control_points:
+    - x: -2.0
+      y: -2.0
+    - x: -1.0
+      y: -1.0
+    - x: 1.0
+      y: 1.0
+    - x: 2.0
+      y: 2.0
