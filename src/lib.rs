@@ -68,7 +68,7 @@ pub fn generate(name: Option<&String>, debug: bool) -> Result<(), Box<dyn Error>
     if !Path::exists(&output_path) {
         fs::create_dir_all(&output_path)?;
     }
-    map::generate(world_settings.seed, &map_settings, output_path, debug);
+    let world = map::generate(world_settings.seed, &map_settings, output_path, debug);
 
     Ok(())
 }
