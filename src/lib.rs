@@ -18,17 +18,23 @@ use std::{
     path::Path,
 };
 
-pub mod world;
+mod people;
+use people::*;
 
+mod simulation;
+use simulation::*;
+
+mod world;
 use world::*;
 
-pub mod utilities;
+mod utilities;
 
 const DEFAULT_WORLD_NAME: &str = "unnamed_world";
 const DEFAULT_SETTINGS_PATH: &str = "settings";
 const DEFAULT_OUTPUT_PATH: &str = "output";
 const DEFAULT_WORLD_SETTINGS_FILE: &str = "world_settings.yml";
 const DEFAULT_MAP_SETTINGS_FILE: &str = "map_settings.yml";
+const DEFAULT_SIMULATION_FILE: &str = "simulation.rpg";
 
 pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Error>> {
     let path = Path::new(".")
@@ -68,7 +74,15 @@ pub fn generate(name: Option<&String>, debug: bool) -> Result<(), Box<dyn Error>
     if !Path::exists(&output_path) {
         fs::create_dir_all(&output_path)?;
     }
-    let world = map::generate(world_settings.seed, &map_settings, output_path, debug);
+    let world = map::generate(world_settings.seed, &map_settings, &output_path, debug);
+    let people = people::generate();
+
+    let simulation = Simulation { world, people };
+
+    let simulation_path = Path::new(&output_path).join(DEFAULT_SIMULATION_FILE);
+    let file = File::create(simulation_path)?;
+    //@todo: maybe use binary writer?
+    serde_yaml::to_writer(file, &simulation)?;
 
     Ok(())
 }

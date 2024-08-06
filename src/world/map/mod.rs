@@ -6,6 +6,7 @@ pub mod map_settings;
 pub mod min_settings;
 pub mod scale_settings;
 pub mod terrain_shape;
+pub mod tile;
 
 use std::path::PathBuf;
 
@@ -13,16 +14,19 @@ use map_settings::MapSettings;
 use noise::utils::{
     ColorGradient, ImageRenderer, NoiseMapBuilder, PlaneMapBuilder, SphereMapBuilder,
 };
+use serde::{Deserialize, Serialize};
+use tile::Tile;
 
 use crate::utilities::UVec2;
 
+#[derive(Serialize, Deserialize)]
 pub struct World {
-    tiles: Vec<(usize, usize, f64)>,
+    tiles: Vec<Tile>,
     size: UVec2,
 }
 
-pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf, debug: bool) -> World {
-    let result = settings.generate(seed, &path, debug);
+pub fn generate(seed: u32, settings: &MapSettings, path: &PathBuf, debug: bool) -> World {
+    let result = settings.generate(seed, path, debug);
 
     let mut color_gradient = ColorGradient::new();
     for gradient_point in &settings.color_gradient {
@@ -53,7 +57,7 @@ pub fn generate(seed: u32, settings: &MapSettings, path: PathBuf, debug: bool) -
     let mut values = Vec::new();
     for x in 0..sphere_map.size().0 {
         for y in 0..sphere_map.size().1 {
-            values.push((x, y, sphere_map.get_value(x, y)));
+            values.push(Tile::new(x, y, sphere_map.get_value(x, y)));
         }
     }
 
