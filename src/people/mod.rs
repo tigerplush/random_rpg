@@ -19,13 +19,13 @@ pub fn generate(seed: u32, names: &HumanNames) -> People {
         let gender = match random_number {
             0 => Gender::Male,
             1 => Gender::Female,
-            _ => Gender::NonBinary,
+            _ => Gender::Nonbinary,
         };
         let surname = names.surnames[rng.gen_range(0..names.surnames.len())].to_owned();
         let name = match gender {
             Gender::Male => names.male[rng.gen_range(0..names.male.len())].to_owned(),
             Gender::Female => names.female[rng.gen_range(0..names.female.len())].to_owned(),
-            Gender::NonBinary => names.non_binary[rng.gen_range(0..names.non_binary.len())].to_owned(),
+            Gender::Nonbinary => names.non_binary[rng.gen_range(0..names.non_binary.len())].to_owned(),
         };
         alive.push(Person {
             gender,

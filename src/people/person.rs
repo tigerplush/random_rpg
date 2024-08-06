@@ -11,5 +11,5 @@ pub struct Person {
 pub enum Gender {
     Male,
     Female,
-    NonBinary,
+    Nonbinary,
 }
