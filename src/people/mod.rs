@@ -25,7 +25,7 @@ pub fn generate(seed: u32, names: &HumanNames) -> People {
         let name = match gender {
             Gender::Male => names.male[rng.gen_range(0..names.male.len())].to_owned(),
             Gender::Female => names.female[rng.gen_range(0..names.female.len())].to_owned(),
-            Gender::NonBinary => names.female[rng.gen_range(0..names.female.len())].to_owned(),
+            Gender::NonBinary => names.non_binary[rng.gen_range(0..names.non_binary.len())].to_owned(),
         };
         alive.push(Person {
             gender,
