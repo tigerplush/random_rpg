@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Serialize, Deserialize)]
 pub struct HumanNames {
     pub male: Vec<String>,
@@ -21,7 +20,7 @@ impl Default for HumanNames {
                 "Bard".to_string(),
                 "Bartholomew".to_string(),
                 "Benedict".to_string(),
-                ],
+            ],
             female: vec![
                 "Adelaide".to_string(),
                 "Amelia".to_string(),
