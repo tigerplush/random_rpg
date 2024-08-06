@@ -18,6 +18,9 @@ use std::{
     path::Path,
 };
 
+mod names;
+use names::*;
+
 mod people;
 use people::*;
 
@@ -34,6 +37,7 @@ const DEFAULT_SETTINGS_PATH: &str = "settings";
 const DEFAULT_OUTPUT_PATH: &str = "output";
 const DEFAULT_WORLD_SETTINGS_FILE: &str = "world_settings.yml";
 const DEFAULT_MAP_SETTINGS_FILE: &str = "map_settings.yml";
+const DEFAULT_HUMAN_NAMES_FILE: &str = "human_names.yml";
 const DEFAULT_SIMULATION_FILE: &str = "simulation.rpg";
 
 pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Error>> {
@@ -52,6 +56,10 @@ pub fn init(name: Option<&String>, seed: Option<&u32>) -> Result<(), Box<dyn Err
     let file = File::create(settings_path)?;
     serde_yaml::to_writer(file, &MapSettings::default())?;
 
+    let names_path = Path::new(&path).join(DEFAULT_HUMAN_NAMES_FILE);
+    let file = File::create(names_path)?;
+    serde_yaml::to_writer(file, &HumanNames::default())?;
+
     Ok(())
 }
 
@@ -68,6 +76,10 @@ pub fn generate(name: Option<&String>, debug: bool) -> Result<(), Box<dyn Error>
     let file = File::open(settings_path)?;
     let map_settings: MapSettings = serde_yaml::from_reader(file)?;
 
+    let names_path = Path::new(&path).join(DEFAULT_HUMAN_NAMES_FILE);
+    let file = File::open(names_path)?;
+    let human_names: HumanNames = serde_yaml::from_reader(file)?;
+
     let output_path = Path::new(".")
         .join(name.unwrap_or(&String::from(DEFAULT_WORLD_NAME)))
         .join(DEFAULT_OUTPUT_PATH);
@@ -75,7 +87,7 @@ pub fn generate(name: Option<&String>, debug: bool) -> Result<(), Box<dyn Error>
         fs::create_dir_all(&output_path)?;
     }
     let world = map::generate(world_settings.seed, &map_settings, &output_path, debug);
-    let people = people::generate();
+    let people = people::generate(world_settings.seed, &human_names);
 
     let simulation = Simulation { world, people };
 
